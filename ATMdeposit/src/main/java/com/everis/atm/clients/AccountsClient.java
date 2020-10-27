@@ -5,11 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.everis.atm.entity.Accounts;
+import com.everis.atm.entity.AccountResponse;
 
 @FeignClient(name = "accounts-service",  url="localhost:8006")
 @RequestMapping("/core")
 public interface AccountsClient {
 	@GetMapping(value = "/accounts/{cardNumber}")
-    public ResponseEntity<Accounts> getAccounts(@PathVariable("cardNumber") String cardNumber);
+    public AccountResponse getAccounts(@PathVariable("cardNumber") String cardNumber);
 }

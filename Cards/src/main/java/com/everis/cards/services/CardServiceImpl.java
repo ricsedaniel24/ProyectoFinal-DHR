@@ -6,7 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.everis.cards.model.Card;
+import com.everis.cards.entity.Card;
+import com.everis.cards.model.CardResponse;
 
 @Service
 public class CardServiceImpl implements ICardService{
@@ -14,7 +15,7 @@ public class CardServiceImpl implements ICardService{
 
 
 	@Override
-	public List<Card> listaTarjetas(String dni) {
+	public CardResponse listaTarjetas(String dni) {
 		
 		List<Card>  dataRepository = new ArrayList<>();
 		dataRepository.add(new Card("1111222233334441", true));
@@ -23,10 +24,10 @@ public class CardServiceImpl implements ICardService{
 		dataRepository.add(new Card("1111222233334444", false));
 		dataRepository.add(new Card("1111222233334445", false));
 		dataRepository.add(new Card("1111222233334446", false));
-
+	    CardResponse cardResponse = new CardResponse();
+	    cardResponse.setCards(dataRepository);
 		
-		
-		return dataRepository;
+		return cardResponse;
 
 	}
 

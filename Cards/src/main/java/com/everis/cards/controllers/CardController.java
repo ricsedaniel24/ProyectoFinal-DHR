@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.everis.cards.model.Card;
+import com.everis.cards.model.CardResponse;
 import com.everis.cards.services.ICardService;
 
 
@@ -22,18 +22,21 @@ public class CardController {
 		private ICardService service;
 	
 		@GetMapping(value = "/cards/{documentNumber}")
-	    public ResponseEntity<List<Card>> getCardsNumber(@PathVariable("documentNumber") String documentNumber) {
-		 List<Card> lista =null;
-		 try {
-			 lista = service.listaTarjetas(documentNumber);
-			} catch (Exception e) {
-				return new ResponseEntity<List<Card>>(lista, HttpStatus.INTERNAL_SERVER_ERROR);
+//	    public ResponseEntity<CardResponse> getCardsNumber(@PathVariable("documentNumber") String documentNumber) {
+//		CardResponse lista =null;
+//		 try {
+//			 lista = service.listaTarjetas(documentNumber);
+//			} catch (Exception e) {
+//				return new ResponseEntity<CardResponse>(lista, HttpStatus.INTERNAL_SERVER_ERROR);
+//			}
+//			return new ResponseEntity<CardResponse>(lista, HttpStatus.OK);
+//
+//		}
+		 public CardResponse getCardsNumber(@PathVariable("documentNumber") String documentNumber) {
+				
+					return service.listaTarjetas(documentNumber);
+					
 			}
-			return new ResponseEntity<List<Card>>(lista, HttpStatus.OK);
-
-	    
-		}
-
 	
 	
 	

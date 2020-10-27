@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.everis.atm.entity.Card;
+import com.everis.atm.entity.CardResponse;
 
 
 @FeignClient(name = "cards-service",  url="localhost:8005")
@@ -16,6 +17,6 @@ import com.everis.atm.entity.Card;
 public interface CardsClient {
 
 	@GetMapping(value = "/cards/{documentNumber}")
-    public ResponseEntity<List<Card>> getCardsNumber(@PathVariable("documentNumber") String documentNumber);
+    public CardResponse getCardsNumber(@PathVariable("documentNumber") String documentNumber);
 	
 }

@@ -1,8 +1,5 @@
-package com.everis.atm.entity;
+package com.everis.cards.entity;
 
-
-
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,15 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Card {
-
 	private String cardNumber;
 
 	private boolean active;
-
-	
-	
 }

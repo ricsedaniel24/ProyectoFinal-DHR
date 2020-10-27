@@ -1,4 +1,4 @@
-package com.everis.cards.model;
+package com.everis.atm.entity;
 
 
 
@@ -9,13 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+public class AccountResponse{
 
-public class Card {
-
-	private String cardNumber;
-
-	private boolean active;
+	private String  accountNumber;
 	
-	
+	private double  amount;
 	
 }

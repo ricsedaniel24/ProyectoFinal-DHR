@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Account {
+public class AccountResponse {
 
 	private String accountNumber;
 

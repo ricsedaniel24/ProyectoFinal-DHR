@@ -12,12 +12,15 @@ import com.everis.atm.clients.CardsClient;
 import com.everis.atm.clients.FingerPrintClient;
 import com.everis.atm.clients.PersonClient;
 import com.everis.atm.clients.ReniecClient;
-import com.everis.atm.entity.Accounts;
+import com.everis.atm.entity.AccountResponse;
+import com.everis.atm.entity.AccountResponseAtm;
 import com.everis.atm.entity.Card;
+import com.everis.atm.entity.CardResponse;
 import com.everis.atm.entity.FingerPrints;
 import com.everis.atm.entity.Person;
 import com.everis.atm.entity.Reniec;
-import com.everis.atm.model.ATM;
+import com.everis.atm.model.ATMRequest;
+import com.everis.atm.model.ATMResponse;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,89 +42,83 @@ public class ATMserviceImpl implements IATMservice{
     AccountsClient accountClient;
     
     double montoTotal = 0;
-    Accounts account = new Accounts();
+    AccountResponse account = new AccountResponse();
     long start = System.currentTimeMillis();
     
+    AccountResponseAtm accountResponseAtm;
+    
 	@Override
-	public ATM consultaSaldo(String document) {
-
+//	public ATMResponse consultaSaldo(String document) {
+    	public ATMResponse consultaSaldo(ATMRequest atmrequest) {
 
 		Person person = new Person();
 		FingerPrints fingerPrint = new FingerPrints();
 		Reniec reniec = new Reniec();
-		ATM atmResponse = new ATM();
+		ATMResponse atmResponse = null;
 
 		List<Card> cardList = new ArrayList<>();
-		List<Accounts> cuentasValidas = new ArrayList<>();
+		List<AccountResponse> cuentasValidas = new ArrayList<>();
 
 		// capturando el JSON document 
-		JSONObject jsonDocument = new JSONObject(document);
+//		JSONObject jsonDocument = new JSONObject(document);
+//		String documentNumber = jsonDocument.getString("document");
 
-		String documentNumber = jsonDocument.getString("document");// capturando el valor del document
-
-		log.info("dni : {}", documentNumber);
+		
 		// llamada al servicio PERSON
-		person = personClient.getByDocument(documentNumber).getBody();
-
+//		person = personClient.getByDocument(documentNumber).getBody();
+		person = personClient.getByDocument(atmrequest.getDocument()).getBody();
+		
 		if (person.isFingerprint() == false) {
 			// llamada a la API Reniec
-			reniec = reniecClient.validar(document).getBody();
+			reniec = reniecClient.validar(atmrequest.getDocument()).getBody();
 			atmResponse.setFingerprintEntityName(reniec.getEntityName());
 
 		} else {
 
 			// llamada a la API FingerPrint
-			fingerPrint = fingerClient.validar(document).getBody();
+			fingerPrint = fingerClient.validar(atmrequest.getDocument()).getBody();
 			atmResponse.setFingerprintEntityName(fingerPrint.getEntityName());
 		}
 
 		// llamada a la API Cards
-		cardList = cardClient.getCardsNumber(documentNumber).getBody();
+		CardResponse cardResponse = findCardClient(atmrequest.getDocument());
+		List<Card> listCards = cardResponse.getCards();
 
-		cardList = cardList.stream().filter(data -> data.isActive() == true).collect(Collectors.toList());// lista de  tarjetas activas
-		System.out.println("tarjetas activas -> " + cardList);
+		List<Card> cardsActive = listCards.stream().filter(card -> card.isActive()).collect(Collectors.toList());
 
-		
-		// llamada a la API Accounts
+		List<AccountResponse> listAccountResponse = new ArrayList<>();
 
-		cardList.parallelStream().forEach((Card card) -> {
-		    try { 
-		    	
-		    		account = accountClient.getAccounts(card.getCardNumber()).getBody();
-		    		montoTotal = account.getAmount() + montoTotal;
-					cuentasValidas.add(account);
-					Thread.sleep(5000);
-		    } catch (Exception ignore) {  }
-		    System.out.print( " tiempos ->  ");
-		    System.out.print((System.currentTimeMillis() - start) + " ");
+		List<AccountResponseAtm> listAccountResponseAtm = new ArrayList<>();
+
+		cardsActive.parallelStream().forEach(card -> {
+			AccountResponse accountResponse = getAccountClient(card.getCardNumber());
+			listAccountResponse.add(accountResponse);
+			accountResponseAtm = new AccountResponseAtm();
+			accountResponseAtm.setAccountNumber(accountResponse.getAccountNumber());
+			listAccountResponseAtm.add(accountResponseAtm);
+			
+			
+			atmResponse.setValidAccounts(listAccountResponseAtm);
+			atmResponse.addAmount(accountResponse.getAmount());
 		});
-		
-		//secuencial sin paralelismo
-//		for (Card card : cardList) {
-//		try {
-//			Thread.sleep(5000);
-//			account = accountClient.getAccounts(card.getCardNumber()).getBody();
-//
-//			montoTotal = account.getAmount() + montoTotal;
-//			cuentasValidas.add(account);
-//		} catch (Exception e) {
-//
-//		}
-
-//		// llamada a la API Accounts
-//		account = accountClient.getAccounts(card.getCardNumber()).getBody();
-//
-//		montoTotal = account.getAmount() + montoTotal;
-//		cuentasValidas.add(account);
-		
-		
-		
-		atmResponse.setValidAccounts(cuentasValidas);
-		atmResponse.setCustomerAmount(montoTotal);
 
 		return atmResponse;
 
+		
+		
 	}
+	
+
+	
+	public CardResponse findCardClient(String document) {
+		return  cardClient.getCardsNumber(document);
+	}
+	public AccountResponse getAccountClient(String cardNumber) {
+		return accountClient.getAccounts(cardNumber);
+	}
+	
+	
+	
 	
 	
 

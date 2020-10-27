@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.everis.atm.model.ATM;
+import com.everis.atm.model.ATMRequest;
+import com.everis.atm.model.ATMResponse;
 import com.everis.atm.services.IATMservice;
 
 
@@ -24,17 +25,10 @@ public class AtmController {
 	private IATMservice service;
 	
 	@PostMapping(value = "/deposits")
-	public ResponseEntity<ATM> AtmDeposit(@RequestBody String document) {
+	public ATMResponse AtmDeposit(@RequestBody ATMRequest atmrequest) {
 	
-		ATM response = new ATM();
+		return  service.consultaSaldo(atmrequest);
 		
-		try {
-			response = service.consultaSaldo(document);
-		} catch (Exception e) {
-			return new ResponseEntity<ATM>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return new ResponseEntity<ATM>(response, HttpStatus.OK);
-
 	}
 	
 	
